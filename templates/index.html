@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unemployment Rate Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            color: #333;
+        }
+        label, input {
+            margin-bottom: 10px;
+        }
+        input[type="date"] {
+            padding: 8px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e7f4e4;
+            border: 1px solid #4CAF50;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Unemployment Rate Prediction</h1>
+    <form id="predictionForm">
+        <label for="date">Enter a date:</label>
+        <input type="date" id="date" required>
+        <button type="submit">Get Prediction</button>
+    </form>
+
+    <div class="result" id="result" style="display: none;">
+        <h3>Predicted Unemployment Rate:</h3>
+        <p id="predictedRate"></p>
+    </div>
+
+    <script>
+        // Function to handle the form submission
+        document.getElementById('predictionForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent page refresh on form submission
+
+            const date = document.getElementById('date').value;
+            if (date) {
+                // Show a loading message
+                document.getElementById('result').style.display = 'none';
+                document.getElementById('predictedRate').textContent = 'Loading...';
+
+                // Send POST request to the Flask API
+                fetch('http://127.0.0.1:5000/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ date: date }) // Send the date as JSON
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Show the prediction result
+                    const prediction = data.predicted_unemployment_rate;
+                    document.getElementById('predictedRate').textContent = `${prediction.toFixed(2)}%`;
+                    document.getElementById('result').style.display = 'block';
+                })
+                .catch(error => {
+                    // Handle error
+                    document.getElementById('predictedRate').textContent = 'Error: Could not fetch prediction.';
+                    document.getElementById('result').style.display = 'block';
+                });
+            } else {
+                alert("Please select a date.");
+            }
+        });
+    </script>
+</body>
+</html>
