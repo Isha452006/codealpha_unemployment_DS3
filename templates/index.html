@@ -4,90 +4,122 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unemployment Rate Prediction</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <!-- Internal CSS -->
     <style>
+        /* General Reset + Body Styling */
         body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-image: url("/static/emp.jpg"); /* Background image */
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
         }
+
+        /* Container Styling for Form */
+        .container {
+            background: rgba(0, 0, 0, 0.6); /* Semi-transparent dark background */
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+        }
+
         h1 {
-            color: #333;
+            margin-bottom: 30px;
+            font-size: 2em;
+            font-weight: 700;
         }
-        label, input {
-            margin-bottom: 10px;
+
+        /* Form Input Styles */
+        label {
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            display: block;
         }
+
         input[type="date"] {
-            padding: 8px;
+            width: 100%;
+            padding: 12px;
             font-size: 16px;
+            border-radius: 8px;
+            border: 2px solid #ccc;
+            background-color: #fff;
+            margin-bottom: 25px;
+            box-sizing: border-box;
         }
+
+        /* Submit Button Styles */
         button {
-            padding: 10px 15px;
+            width: 100%;
+            padding: 12px;
             font-size: 16px;
             background-color: #4CAF50;
             color: white;
             border: none;
+            border-radius: 8px;
             cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
         }
+
         button:hover {
             background-color: #45a049;
         }
+
+        /* Result Box Styling */
         .result {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #e7f4e4;
-            border: 1px solid #4CAF50;
-            color: #333;
+            margin-top: 25px;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #fff;
+            display: none;
+        }
+
+        /* Styling for Success and Error messages */
+        .success {
+            color: #4CAF50;
+        }
+
+        .error {
+            color: #f44336;
         }
     </style>
 </head>
 <body>
-    <h1>Unemployment Rate Prediction</h1>
-    <form id="predictionForm">
-        <label for="date">Enter a date:</label>
-        <input type="date" id="date" required>
-        <button type="submit">Get Prediction</button>
-    </form>
+    <div class="container">
+        <h1>Unemployment Rate Prediction</h1>
 
-    <div class="result" id="result" style="display: none;">
-        <h3>Predicted Unemployment Rate:</h3>
-        <p id="predictedRate"></p>
+        <!-- Form for Date Input -->
+        <form method="POST" action="/predict">
+            <label for="date">Select a Date:</label>
+            <input type="date" id="date" name="date" required>
+
+            <button type="submit">Get Prediction</button>
+        </form>
+
+        <!-- Prediction Result Section -->
+      
+            <div class="result success">
+                <h3>Predicted Unemployment Rate:</h3>
+                <p>{{ prediction }}%</p>
+            </div>
+       
+            <div class="result error">
+                <h3>Error:</h3>
+                <p>{{ error }}</p>
+            </div>
+        
     </div>
-
-    <script>
-        // Function to handle the form submission
-        document.getElementById('predictionForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent page refresh on form submission
-
-            const date = document.getElementById('date').value;
-            if (date) {
-                // Show a loading message
-                document.getElementById('result').style.display = 'none';
-                document.getElementById('predictedRate').textContent = 'Loading...';
-
-                // Send POST request to the Flask API
-                fetch('http://127.0.0.1:5000/predict', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ date: date }) // Send the date as JSON
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // Show the prediction result
-                    const prediction = data.predicted_unemployment_rate;
-                    document.getElementById('predictedRate').textContent = `${prediction.toFixed(2)}%`;
-                    document.getElementById('result').style.display = 'block';
-                })
-                .catch(error => {
-                    // Handle error
-                    document.getElementById('predictedRate').textContent = 'Error: Could not fetch prediction.';
-                    document.getElementById('result').style.display = 'block';
-                });
-            } else {
-                alert("Please select a date.");
-            }
-        });
-    </script>
 </body>
 </html>
